@@ -1,0 +1,12 @@
+.topbar{max-width:1320px}
+.topbar nav{gap:24px;align-items:center}
+.topbar nav a{white-space:nowrap}
+@media(max-width:1050px){
+  .topbar{height:auto;min-height:84px;flex-wrap:wrap;padding-top:14px;padding-bottom:10px;gap:10px}
+  .topbar nav{display:flex;order:3;width:100%;overflow-x:auto;gap:22px;padding:10px 2px 5px;scrollbar-width:thin}
+  .topbar nav a{font-size:12px}
+}
+@media(max-width:570px){
+  .topbar{min-height:112px}
+  .topbar nav{display:flex}
+}

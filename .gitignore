@@ -1,0 +1,29 @@
+# Banco de dados local e cópias de segurança
+banco/*.db
+banco/*.sqlite
+banco/*.sqlite3
+
+# Planilhas e relatórios operacionais importados
+*.xls
+*.xlsx
+*.csv
+
+# Cache e ambiente Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Backups locais do projeto
+restauracao/
+
+# Arquivos do sistema e editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Arquivos temporários e logs
+*.log
+*.tmp
+~$*

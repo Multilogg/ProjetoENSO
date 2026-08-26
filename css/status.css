@@ -1,0 +1,15 @@
+.action{grid-template-columns:minmax(260px,1fr) 120px 105px 145px;gap:14px}
+.status-select{width:100%;border:1px solid var(--line);border-radius:9px;padding:8px 26px 8px 9px;background:var(--paper);color:var(--ink);font:600 10px "DM Sans",sans-serif;cursor:pointer;outline:none}
+.owner-select,.deadline-input{width:100%;min-width:0;border:1px solid var(--line);border-radius:9px;padding:8px 9px;background:var(--paper);color:var(--ink);font:600 10px "DM Sans",sans-serif;outline:none}.owner-select{cursor:pointer}.owner-select:focus,.deadline-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(24,79,69,.08)}.editable-pillar{margin-top:12px}.editable-pillar:first-child{margin-top:24px}
+.leader-select{border:1px solid var(--line);cursor:pointer;outline:none;font:700 10px "DM Sans",sans-serif;text-transform:uppercase}.leader-select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(24,79,69,.08)}
+.status-select[data-status="progress"]{background:#eef2f5;color:#586875;border-color:#d8e0e5}
+.status-select[data-status="notstarted"]{background:#f4f3ef;color:#77756d;border-color:#dfddd5}
+.status-select[data-status="pending"]{background:#fff3d8;color:#8a6518;border-color:#ecd69f}
+.status-select[data-status="delivered"]{background:#e7f5de;color:#34703b;border-color:#c9e6ba}
+.status-select[data-status="late"]{background:#f9e4df;color:#a34335;border-color:#efc3b9}
+body.dark .status-select[data-status="progress"]{background:#263b42;color:#c7d3d8;border-color:#3c555e}
+body.dark .status-select[data-status="notstarted"]{background:#252a29;color:#aeb7b4;border-color:#3b4441}
+body.dark .status-select[data-status="pending"]{background:#4b3d22;color:#f0d28d;border-color:#6b5730}
+body.dark .status-select[data-status="delivered"]{background:#24442e;color:#b9e8bd;border-color:#376a45}
+body.dark .status-select[data-status="late"]{background:#512e29;color:#f2b9af;border-color:#74443c}
+@media(max-width:760px){.actions-table{overflow-x:auto}.action{min-width:700px}}
