@@ -349,7 +349,7 @@ if (monthlyBars) {
         const hasAverage = indicatorItem.total > 0;
         const withinRealGoal = hasAverage && indicatorItem.tempo_medio <= indicatorRealGoalMinutes[index];
         timeCard.classList.add('time-kpi');
-        timeCard.insertAdjacentHTML('afterbegin', `<i class="kpi-goal-status ${hasAverage ? (withinRealGoal ? 'is-inside' : 'is-outside') : 'is-empty'}" tabindex="0" data-tooltip="Meta real ${indicatorRealGoals[index]} · Objetivo ENSO ${indicatorGoals[index]}" aria-label="${hasAverage ? (withinRealGoal ? 'Dentro da meta real.' : 'Fora da meta real.') : 'Sem dados.'} Meta real ${indicatorRealGoals[index]}. Objetivo ENSO ${indicatorGoals[index]}."></i>`);
+        timeCard.insertAdjacentHTML('afterbegin', `<i class="kpi-goal-status ${hasAverage ? (withinRealGoal ? 'is-inside' : 'is-outside') : 'is-empty'}" tabindex="0" aria-label="${hasAverage ? (withinRealGoal ? 'Dentro da meta real.' : 'Fora da meta real.') : 'Sem dados.'} Meta real ${indicatorRealGoals[index]}. Objetivo ENSO ${indicatorGoals[index]}."><span class="kpi-goal-tooltip"><b><small>Meta real</small><strong>${indicatorRealGoals[index]}</strong></b><b><small>Objetivo ENSO</small><strong>${indicatorGoals[index]}</strong></b></span></i>`);
       });
       kpiContainer.querySelectorAll('.outside-goal-open').forEach(button => button.addEventListener('click', () => openOutsideGoalDetails(button.dataset.indicator, button.dataset.label)));
     }
