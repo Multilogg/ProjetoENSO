@@ -6,36 +6,57 @@
   align-items: flex-start;
 }
 .kpi-goal-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  width: 100%;
   margin-top: auto;
 }
 .indicator-kpi-row .time-kpi .enso-goal {
   position: static;
-  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  min-width: 0;
+  padding: 8px 9px;
+  border-color: #cfe2ef;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #f1f8fd, #e8f2fa);
+  color: #52718f;
+  font-size: 7px;
+  line-height: 1.1;
+  letter-spacing: .02em;
   margin-top: 0;
   white-space: nowrap;
 }
-.indicator-kpi-row .time-kpi .real-goal {
-  border-color: #cdddeb;
-  background: #edf5fb;
-  color: #55708e;
+.indicator-kpi-row .time-kpi .enso-goal b {
+  flex: 0 0 auto;
+  margin: 0;
+  color: #15528e;
+  font: 700 11px Manrope, sans-serif;
+  letter-spacing: -.02em;
 }
-.indicator-kpi-row .time-kpi .real-goal b { color: #174b86; }
+.indicator-kpi-row .time-kpi .real-goal {
+  border-color: #cce8df;
+  background: linear-gradient(145deg, #f0faf7, #e5f5f0);
+  color: #4f776b;
+}
+.indicator-kpi-row .time-kpi .real-goal b { color: #187d68; }
 .kpi-goal-status {
   position: absolute;
   top: 17px;
   right: 17px;
-  width: 11px;
-  height: 11px;
+  width: 10px;
+  height: 10px;
   border: 2px solid #fff;
   border-radius: 50%;
-  box-shadow: 0 0 0 3px rgba(94, 115, 139, .12);
+  box-shadow: 0 0 0 4px rgba(94, 115, 139, .1);
 }
-.kpi-goal-status.is-inside { background: #2eaa72; box-shadow: 0 0 0 3px rgba(46, 170, 114, .15); }
-.kpi-goal-status.is-outside { background: #df5b52; box-shadow: 0 0 0 3px rgba(223, 91, 82, .15); }
+.kpi-goal-status.is-inside { background: #25a875; box-shadow: 0 0 0 4px rgba(37, 168, 117, .14), 0 3px 10px rgba(37, 168, 117, .24); }
+.kpi-goal-status.is-outside { background: #dc5a52; box-shadow: 0 0 0 4px rgba(220, 90, 82, .14), 0 3px 10px rgba(220, 90, 82, .22); }
 .kpi-goal-status.is-empty { background: #9aaabd; }
+
 .outside-goal-open {
   position: absolute;
   top: 14px;
