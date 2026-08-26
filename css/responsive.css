@@ -184,3 +184,10 @@ input, select, button { max-width: 100%; }
   .portal > .project-origin .pto-rule { min-height: 140px !important; padding: 21px !important; }
   .portal > .project-origin .pto-rule .goal-evolution strong { font-size: 23px !important; }
 }
+/* O menu principal permanece visível em qualquer posição da página. */
+body[data-theme="multilog"] .topbar.topbar-hidden,
+.topbar.topbar-hidden {
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
