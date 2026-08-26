@@ -129,7 +129,19 @@
     const target = typeof input === 'string' ? input : input?.url || '';
     if (!target.startsWith('/api/')) return nativeFetch(input, options);
     try {
-      if (target.startsWith('/api/importar')) return jsonResponse({ erro: 'Importe localmente e sincronize com o Supabase.' }, 400);
+      if (target.startsWith('/api/importar')) {
+        const result = await nativeFetch(`${config.url}/functions/v1/importar-base`, {
+          method: 'POST', body: options.body,
+          headers: { apikey: config.publishableKey, Authorization: `Bearer ${config.publishableKey}` }
+        });
+        const payload = await result.json();
+        if (result.ok) {
+          Object.keys(localStorage).filter(key => key.startsWith(cachePrefix)).forEach(key => localStorage.removeItem(key));
+          operationsPromise = null;
+          versionPromise = null;
+        }
+        return jsonResponse(payload, result.status);
+      }
       const version = await currentVersion();
       const cacheKey = `${cachePrefix}${target}`;
       const cached = localStorage.getItem(cacheKey);
