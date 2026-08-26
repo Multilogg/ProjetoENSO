@@ -189,11 +189,11 @@ if (overviewPillars.length) {
   const refreshOverviewStatuses = () => overviewPillars.forEach(pillar => {
     const number = pillar.querySelector(':scope > b')?.textContent.trim();
     const statuses = (pillarTasks[number] || []).map(task => localStorage.getItem(`enso-status-${task}`) || 'notstarted');
-    const allDone = statuses.length > 0 && statuses.every(status => status === 'delivered');
-    const hasLate = statuses.some(status => status === 'late');
-    const hasProgress = statuses.some(status => status === 'progress');
-    const state = allDone ? 'completed' : (hasLate ? 'pending' : 'progress');
-    const label = allDone ? 'Entregue' : (hasLate ? 'Fora do prazo' : 'Em andamento');
+    const delivered = statuses.filter(status => status === 'delivered').length;
+    const total = statuses.length;
+    const allDone = total > 0 && delivered === total;
+    const state = allDone ? 'completed' : (delivered > 0 ? 'progress' : 'notstarted');
+    const label = allDone ? `Concluído · ${delivered}/${total}` : `${delivered}/${total} ações`;
     let badge = pillar.querySelector('.pillar-status');
     if (!badge) {
       badge = document.createElement('span');
@@ -210,6 +210,7 @@ if (overviewPillars.length) {
     }
     badge.dataset.status = state;
     badge.textContent = label;
+    badge.style.setProperty('--pillar-progress', `${total ? delivered * 100 / total : 0}%`);
   });
   refreshOverviewStatuses();
   window.addEventListener('storage', refreshOverviewStatuses);
