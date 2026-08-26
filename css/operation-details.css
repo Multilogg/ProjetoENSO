@@ -1,4 +1,5 @@
 .danger-kpi { position: relative; }
+.indicator-kpi-section { overflow: visible !important; }
 .indicator-kpi-row .time-kpi {
   position: relative;
   display: flex;
@@ -22,7 +23,7 @@
 .kpi-goal-status.is-empty { background: #9aaabd; }
 .kpi-goal-tooltip {
   position: absolute;
-  z-index: 5;
+  z-index: 100;
   right: -6px;
   bottom: 25px;
   display: grid;
@@ -61,8 +62,20 @@
 }
 .kpi-goal-tooltip b:first-child { background: #edf8f4; color: #267560; }
 .kpi-goal-tooltip b:last-child { background: #edf5fb; color: #255b91; }
-.kpi-goal-tooltip small { font: 600 8px "DM Sans", sans-serif; white-space: nowrap; }
-.kpi-goal-tooltip strong { font: 700 12px Manrope, sans-serif; white-space: nowrap; }
+.indicator-kpi-row .time-kpi .kpi-goal-tooltip small {
+  display: inline;
+  margin: 0;
+  color: inherit;
+  font: 600 8px/1.2 "DM Sans", sans-serif !important;
+  white-space: nowrap;
+}
+.indicator-kpi-row .time-kpi .kpi-goal-tooltip strong {
+  display: inline;
+  margin: 0;
+  color: inherit;
+  font: 700 12px/1 Manrope, sans-serif !important;
+  white-space: nowrap;
+}
 .kpi-goal-status:hover .kpi-goal-tooltip,
 .kpi-goal-status:focus-visible .kpi-goal-tooltip {
   opacity: 1;
