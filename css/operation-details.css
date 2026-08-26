@@ -1,4 +1,15 @@
 .danger-kpi { position: relative; }
+.indicator-kpi-row .time-kpi {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.indicator-kpi-row .time-kpi .enso-goal {
+  position: static;
+  align-self: flex-start;
+  margin-top: auto;
+  white-space: nowrap;
+}
 .outside-goal-open {
   position: absolute;
   top: 14px;
