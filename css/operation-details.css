@@ -1,5 +1,5 @@
 .danger-kpi { position: relative; }
-.indicator-kpi-section { overflow: visible !important; }
+.indicator-kpi-section { overflow: hidden !important; }
 .indicator-kpi-row .time-kpi {
   position: relative;
   display: flex;
@@ -22,10 +22,10 @@
 .kpi-goal-status.is-outside { background: #dc5a52; box-shadow: 0 0 0 4px rgba(220, 90, 82, .14), 0 3px 10px rgba(220, 90, 82, .22); }
 .kpi-goal-status.is-empty { background: #9aaabd; }
 .kpi-goal-tooltip {
-  position: absolute;
+  position: fixed;
   z-index: 100;
-  right: -6px;
-  bottom: 25px;
+  top: 0;
+  left: 0;
   display: grid;
   width: 158px;
   padding: 5px;

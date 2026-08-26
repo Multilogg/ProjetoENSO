@@ -350,6 +350,19 @@ if (monthlyBars) {
         const withinRealGoal = hasAverage && indicatorItem.tempo_medio <= indicatorRealGoalMinutes[index];
         timeCard.classList.add('time-kpi');
         timeCard.insertAdjacentHTML('afterbegin', `<i class="kpi-goal-status ${hasAverage ? (withinRealGoal ? 'is-inside' : 'is-outside') : 'is-empty'}" tabindex="0" aria-label="${hasAverage ? (withinRealGoal ? 'Dentro da meta real.' : 'Fora da meta real.') : 'Sem dados.'} Meta real ${indicatorRealGoals[index]}. Objetivo ENSO ${indicatorGoals[index]}."><span class="kpi-goal-tooltip ${hasAverage ? (withinRealGoal ? 'is-inside' : 'is-outside') : 'is-empty'}"><b><small>Meta real</small><strong>${indicatorRealGoals[index]}</strong></b><b><small>Objetivo ENSO</small><strong>${indicatorGoals[index]}</strong></b></span></i>`);
+        const goalStatus = timeCard.querySelector('.kpi-goal-status');
+        const goalTooltip = goalStatus.querySelector('.kpi-goal-tooltip');
+        const placeGoalTooltip = () => {
+          const statusRect = goalStatus.getBoundingClientRect();
+          const tooltipWidth = goalTooltip.offsetWidth || 158;
+          const tooltipHeight = goalTooltip.offsetHeight || 70;
+          const left = Math.min(window.innerWidth - tooltipWidth - 12, Math.max(12, statusRect.right - tooltipWidth + 6));
+          const top = Math.max(12, statusRect.top - tooltipHeight - 13);
+          goalTooltip.style.left = `${left}px`;
+          goalTooltip.style.top = `${top}px`;
+        };
+        goalStatus.addEventListener('mouseenter', placeGoalTooltip);
+        goalStatus.addEventListener('focus', placeGoalTooltip);
       });
       kpiContainer.querySelectorAll('.outside-goal-open').forEach(button => button.addEventListener('click', () => openOutsideGoalDetails(button.dataset.indicator, button.dataset.label)));
     }
