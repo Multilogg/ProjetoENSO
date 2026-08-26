@@ -47,6 +47,8 @@ const spreadsheet = document.querySelector('#spreadsheet');
 const fileName = document.querySelector('#fileName');
 const importButton = document.querySelector('#importButton');
 const importMessage = document.querySelector('#importMessage');
+document.body.insertAdjacentHTML('beforeend', `<div class="import-loading" id="importLoading" hidden role="status" aria-live="polite" aria-label="Importação em andamento"><div class="import-loading-card"><span class="import-spinner" aria-hidden="true"></span><p class="eyebrow">ATUALIZANDO INDICADORES</p><strong>Processando nova base</strong><small>Lendo as O.S., removendo duplicidades e recalculando as metas. Não feche esta página.</small></div></div>`);
+const importLoading = document.querySelector('#importLoading');
 
 spreadsheet.addEventListener('change', () => {
   fileName.textContent = spreadsheet.files[0]?.name || 'Nenhum arquivo selecionado';
@@ -56,6 +58,8 @@ importForm.addEventListener('submit', async event => {
   event.preventDefault();
   if (!spreadsheet.files.length) return;
   importButton.disabled = true; importButton.textContent = 'Analisando...';
+  importLoading.hidden = false;
+  document.body.classList.add('is-importing');
   importMessage.hidden = false; importMessage.className = 'import-message';
   importMessage.textContent = 'Lendo e recalculando a base. Isso pode levar alguns segundos.';
   try {
@@ -69,7 +73,11 @@ importForm.addEventListener('submit', async event => {
     await loadData();
   } catch (error) {
     importMessage.classList.add('error'); importMessage.textContent = error.message;
-  } finally { importButton.disabled = false; importButton.textContent = 'Importar e analisar'; }
+  } finally {
+    importButton.disabled = false; importButton.textContent = 'Importar e analisar';
+    importLoading.hidden = true;
+    document.body.classList.remove('is-importing');
+  }
 });
 
 function dimensionRows(items, dimensionLabel) {
