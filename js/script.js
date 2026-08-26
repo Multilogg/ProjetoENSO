@@ -250,6 +250,64 @@ const monthlyBars = document.querySelector('.chart-panel .bars');
 if (monthlyBars) {
   const monthNames = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
   const formatMonthly = value => new Intl.NumberFormat('pt-BR').format(value);
+  const escapeOperationDetail = value => String(value ?? '').replace(/[&<>'"]/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[character]));
+  const formatDetailMinutes = value => {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) return '—';
+    const minutes = Math.max(0, Math.round(Number(value)));
+    return `${Math.floor(minutes / 60)}h ${String(minutes % 60).padStart(2, '0')}`;
+  };
+  const formatOperationDate = (value, extraDays = 0) => {
+    if (!value) return '—';
+    const date = new Date(value);
+    date.setUTCDate(date.getUTCDate() + extraDays);
+    return new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' }).format(date);
+  };
+  const formatOperationClock = totalMinutes => {
+    const normalized = ((Math.round(totalMinutes) % 1440) + 1440) % 1440;
+    return `${String(Math.floor(normalized / 60)).padStart(2, '0')}:${String(normalized % 60).padStart(2, '0')}`;
+  };
+  document.body.insertAdjacentHTML('beforeend', `<dialog class="outside-goal-dialog" id="outsideGoalDialog" aria-labelledby="outsideGoalTitle"><div class="outside-goal-shell"><header><div><span>DETALHAMENTO OPERACIONAL</span><h2 id="outsideGoalTitle">OS fora da meta</h2><p id="outsideGoalSubtitle"></p></div><button class="outside-goal-close" type="button" aria-label="Fechar">×</button></header><div class="outside-goal-toolbar"><label>Buscar OS ou cliente<input id="outsideGoalSearch" type="search" placeholder="Digite para filtrar..."></label><strong id="outsideGoalCount"></strong></div><div class="outside-goal-table-wrap"><table class="outside-goal-table"><thead><tr><th>OS</th><th>Cliente</th><th>Modal</th><th>Data</th><th>Início</th><th>Término</th><th>Tempo</th><th>Meta</th><th>Atraso</th></tr></thead><tbody id="outsideGoalRows"></tbody></table></div></div></dialog>`);
+  const outsideGoalDialog = document.querySelector('#outsideGoalDialog');
+  const outsideGoalRows = document.querySelector('#outsideGoalRows');
+  const outsideGoalSearch = document.querySelector('#outsideGoalSearch');
+  let currentOutsideGoalRows = [];
+  const renderOutsideGoalRows = () => {
+    const query = outsideGoalSearch.value.trim().toLocaleLowerCase('pt-BR');
+    const visible = currentOutsideGoalRows.filter(item => !query || `${item.os} ${item.cliente} ${item.modal}`.toLocaleLowerCase('pt-BR').includes(query));
+    document.querySelector('#outsideGoalCount').textContent = `${formatMonthly(visible.length)} OS`;
+    outsideGoalRows.innerHTML = visible.length ? visible.map(item => {
+      const start = Math.round(Number(item.horario || 0) * 60);
+      const duration = Number(item.tempo_os_min || 0);
+      const finish = start + duration;
+      const finishDays = Math.floor(finish / 1440);
+      const delay = item.meta_min === null ? null : Math.max(0, duration - Number(item.meta_min));
+      return `<tr><td><strong>${escapeOperationDetail(item.os || '—')}</strong></td><td>${escapeOperationDetail(item.cliente || 'NÃO INFORMADO')}</td><td>${escapeOperationDetail(item.modal || '—')}</td><td>${formatOperationDate(item.data_operacao)}</td><td>${formatOperationClock(start)}</td><td><span>${formatOperationClock(finish)}</span>${finishDays ? `<small>${formatOperationDate(item.data_operacao, finishDays)}</small>` : ''}</td><td>${formatDetailMinutes(duration)}</td><td>${formatDetailMinutes(item.meta_min)}</td><td><b class="outside-delay">${delay === null ? '—' : `+${formatDetailMinutes(delay)}`}</b></td></tr>`;
+    }).join('') : '<tr><td colspan="9" class="outside-goal-empty">Nenhuma OS encontrada.</td></tr>';
+  };
+  const openOutsideGoalDetails = (indicator, label) => {
+    const selectedMonths = [...operationMonths.selectedOptions].map(option => option.value);
+    document.querySelector('#outsideGoalTitle').textContent = `OS fora da meta · ${label}`;
+    document.querySelector('#outsideGoalSubtitle').textContent = 'Carregando os registros da consulta atual...';
+    document.querySelector('#outsideGoalCount').textContent = '';
+    outsideGoalRows.innerHTML = '<tr><td colspan="9" class="outside-goal-empty">Carregando...</td></tr>';
+    outsideGoalSearch.value = '';
+    outsideGoalDialog.showModal();
+    fetch(`/api/operacoes-fora-meta?indicador=${encodeURIComponent(indicator)}&meses=${selectedMonths.join(',')}`).then(response => {
+      if (!response.ok) throw new Error('API indisponível');
+      return response.json();
+    }).then(rows => {
+      currentOutsideGoalRows = rows;
+      document.querySelector('#outsideGoalSubtitle').textContent = 'Data e horários da operação, duração, limite aplicável e atraso.';
+      renderOutsideGoalRows();
+    }).catch(() => {
+      currentOutsideGoalRows = [];
+      document.querySelector('#outsideGoalSubtitle').textContent = 'Não foi possível consultar os registros.';
+      outsideGoalRows.innerHTML = '<tr><td colspan="9" class="outside-goal-empty">Tente novamente em instantes.</td></tr>';
+    });
+  };
+  outsideGoalSearch.addEventListener('input', renderOutsideGoalRows);
+  outsideGoalDialog.querySelector('.outside-goal-close').addEventListener('click', () => outsideGoalDialog.close());
+  outsideGoalDialog.addEventListener('click', event => { if (event.target === outsideGoalDialog) outsideGoalDialog.close(); });
   const operationMonthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   const operationAvailableMonth = new Date().getMonth() + 1;
   const operationParams = new URLSearchParams(location.search);
@@ -280,13 +338,14 @@ if (monthlyBars) {
         const itemDuration = Math.round(item.tempo_medio || 0);
         const itemDurationLabel = `${Math.floor(itemDuration / 60)}h ${String(itemDuration % 60).padStart(2,'0')}`;
         const itemAnalyzed = item.dentro + item.fora;
-        return `<section class="indicator-kpi-section"><div class="indicator-kpi-title"><span>PROCESSO</span><h2>${indicatorLabels[key]}</h2><small>${formatMonthly(itemAnalyzed)} operações analisáveis</small></div><div class="indicator-kpi-row"><article class="kpi featured"><span>ADERÊNCIA À META</span><strong>${String(item.aderencia).replace('.',',')}%</strong><p>Percentual dentro do prazo</p></article><article class="kpi"><span>ORDENS DE SERVIÇO</span><strong>${formatMonthly(item.total)}</strong><p>Volume total do processo</p></article><article class="kpi success-kpi"><span>DENTRO DA META</span><strong>${formatMonthly(item.dentro)}</strong><p>Operações dentro do prazo</p></article><article class="kpi danger-kpi"><span>FORA DA META</span><strong>${formatMonthly(item.fora)}</strong><p>Operações acima do prazo</p></article><article class="kpi"><span>TEMPO MÉDIO</span><strong>${itemDurationLabel}</strong><p>Do início ao término da OS</p></article></div></section>`;
+        return `<section class="indicator-kpi-section"><div class="indicator-kpi-title"><span>PROCESSO</span><h2>${indicatorLabels[key]}</h2><small>${formatMonthly(itemAnalyzed)} operações analisáveis</small></div><div class="indicator-kpi-row"><article class="kpi featured"><span>ADERÊNCIA À META</span><strong>${String(item.aderencia).replace('.',',')}%</strong><p>Percentual dentro do prazo</p></article><article class="kpi"><span>ORDENS DE SERVIÇO</span><strong>${formatMonthly(item.total)}</strong><p>Volume total do processo</p></article><article class="kpi success-kpi"><span>DENTRO DA META</span><strong>${formatMonthly(item.dentro)}</strong><p>Operações dentro do prazo</p></article><article class="kpi danger-kpi"><button class="outside-goal-open" type="button" data-indicator="${key}" data-label="${indicatorLabels[key]}" aria-label="Ver OS fora da meta de ${indicatorLabels[key]}">+</button><span>FORA DA META</span><strong>${formatMonthly(item.fora)}</strong><p>Operações acima do prazo</p></article><article class="kpi"><span>TEMPO MÉDIO</span><strong>${itemDurationLabel}</strong><p>Do início ao término da OS</p></article></div></section>`;
       }).join('');
       kpiContainer.querySelectorAll('.indicator-kpi-section').forEach((section, index) => {
         const timeCard = section.querySelector('.indicator-kpi-row .kpi:last-child');
         timeCard.classList.add('time-kpi');
         timeCard.insertAdjacentHTML('beforeend', `<small class="enso-goal">Meta ENSO <b>${indicatorGoals[index]}</b></small>`);
       });
+      kpiContainer.querySelectorAll('.outside-goal-open').forEach(button => button.addEventListener('click', () => openOutsideGoalDetails(button.dataset.indicator, button.dataset.label)));
     }
     const modalTotal = data.modal.reduce((sum, item) => sum + item.total, 0);
     const modalColors = ['var(--green)','var(--teal)','var(--sand)'];

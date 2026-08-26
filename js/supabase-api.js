@@ -44,7 +44,7 @@
     if (operationsPromise) return operationsPromise;
     operationsPromise = (async () => {
       const rows = [];
-      const fields = 'os,cliente,indicador,modal,horario,status_meta,regime,data_operacao,tempo_os_min';
+      const fields = 'os,cliente,indicador,modal,horario,status_meta,regime,data_operacao,tempo_os_min,meta_min';
       for (let offset = 0; ; offset += pageSize) {
         const result = await nativeFetch(`${config.url}/rest/v1/operacoes?select=${fields}&offset=${offset}&limit=${pageSize}`, {
           headers: { apikey: config.publishableKey, Authorization: `Bearer ${config.publishableKey}` }
@@ -125,6 +125,22 @@
       clientes_total: new Set(filtered.map(row => row.cliente)).size, indicadores };
   }
 
+  function outsideGoalOperations(rows, url) {
+    const year = Math.max(...rows.map(row => yearOf(row.data_operacao)).filter(Boolean));
+    const selected = (url.searchParams.get('meses') || '').split(',').map(Number).filter(value => value >= 1 && value <= 12);
+    const indicator = (url.searchParams.get('indicador') || '').toUpperCase();
+    return rows.filter(row => yearOf(row.data_operacao) === year &&
+      (!selected.length || selected.includes(monthOf(row.data_operacao))) &&
+      (!indicator || row.indicador === indicator) && row.status_meta === 'Fora da Meta')
+      .map(row => ({
+        os: row.os, cliente: row.cliente, indicador: row.indicador, modal: row.modal,
+        data_operacao: row.data_operacao, horario: num(row.horario),
+        tempo_os_min: row.tempo_os_min === null ? null : num(row.tempo_os_min),
+        meta_min: row.meta_min === null ? null : num(row.meta_min)
+      }))
+      .sort((a, b) => String(b.data_operacao || '').localeCompare(String(a.data_operacao || '')) || String(a.os).localeCompare(String(b.os)));
+  }
+
   window.fetch = async function (input, options = {}) {
     const target = typeof input === 'string' ? input : input?.url || '';
     if (!target.startsWith('/api/')) return nativeFetch(input, options);
@@ -154,6 +170,7 @@
       let payload;
       if (url.pathname === '/api/indicadores') payload = indicators(rows, url);
       else if (url.pathname === '/api/operacao-mensal') payload = operation(rows, url);
+      else if (url.pathname === '/api/operacoes-fora-meta') payload = outsideGoalOperations(rows, url);
       if (payload) {
         localStorage.setItem(cacheKey, JSON.stringify({ version, payload }));
         return jsonResponse(payload);
