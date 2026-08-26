@@ -3,7 +3,9 @@
   if (!config?.url || !config?.publishableKey) return;
   const nativeFetch = window.fetch.bind(window);
   const pageSize = 1000;
+  const cachePrefix = 'enso-supabase-cache:';
   let operationsPromise;
+  let versionPromise;
   const num = value => Number(value) || 0;
   const monthOf = value => value ? Number(String(value).slice(5, 7)) : 0;
   const yearOf = value => value ? Number(String(value).slice(0, 4)) : 0;
@@ -17,6 +19,26 @@
   const jsonResponse = (payload, status = 200) => new Response(JSON.stringify(payload), {
     status, headers: { 'Content-Type': 'application/json; charset=utf-8' }
   });
+
+  async function currentVersion() {
+    if (versionPromise) return versionPromise;
+    versionPromise = (async () => {
+      const result = await nativeFetch(`${config.url}/rest/v1/importacoes?select=importado_em,registros&order=id.desc&limit=1`, {
+        headers: { apikey: config.publishableKey, Authorization: `Bearer ${config.publishableKey}` }
+      });
+      if (!result.ok) throw new Error(`Supabase indisponível (${result.status})`);
+      const [latest] = await result.json();
+      const version = latest ? `${latest.importado_em}:${latest.registros}` : 'sem-base';
+      const previous = localStorage.getItem(`${cachePrefix}version`);
+      if (previous && previous !== version) {
+        Object.keys(localStorage).filter(key => key.startsWith(cachePrefix)).forEach(key => localStorage.removeItem(key));
+        operationsPromise = null;
+      }
+      localStorage.setItem(`${cachePrefix}version`, version);
+      return version;
+    })().catch(error => { versionPromise = null; throw error; });
+    return versionPromise;
+  }
 
   function loadOperations() {
     if (operationsPromise) return operationsPromise;
@@ -108,10 +130,22 @@
     if (!target.startsWith('/api/')) return nativeFetch(input, options);
     try {
       if (target.startsWith('/api/importar')) return jsonResponse({ erro: 'Importe localmente e sincronize com o Supabase.' }, 400);
+      const version = await currentVersion();
+      const cacheKey = `${cachePrefix}${target}`;
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        const entry = JSON.parse(cached);
+        if (entry.version === version) return jsonResponse(entry.payload);
+      }
       const rows = await loadOperations();
       const url = new URL(target, location.origin);
-      if (url.pathname === '/api/indicadores') return jsonResponse(indicators(rows, url));
-      if (url.pathname === '/api/operacao-mensal') return jsonResponse(operation(rows, url));
+      let payload;
+      if (url.pathname === '/api/indicadores') payload = indicators(rows, url);
+      else if (url.pathname === '/api/operacao-mensal') payload = operation(rows, url);
+      if (payload) {
+        localStorage.setItem(cacheKey, JSON.stringify({ version, payload }));
+        return jsonResponse(payload);
+      }
       return jsonResponse({ erro: 'Rota não encontrada.' }, 404);
     } catch (error) { return jsonResponse({ erro: error.message }, 503); }
   };

@@ -472,3 +472,6 @@ body[data-theme="multilog"] .semester-page .tools b{color:#174b89}
   body[data-theme="multilog"] .semester-page .action{padding-left:21px;padding-right:21px}
   body[data-theme="multilog"] .semester-page .tools{padding-left:21px;padding-right:21px}
 }
+
+/* Evita exibir o painel executivo antigo antes da leitura do banco online. */
+body.operation-page .kpi-grid{visibility:hidden;min-height:300px}

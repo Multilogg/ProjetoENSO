@@ -270,7 +270,8 @@ if (monthlyBars) {
   const operationMonthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   const operationAvailableMonth = new Date().getMonth() + 1;
   const operationParams = new URLSearchParams(location.search);
-  const operationSelected = (operationParams.get('meses') || Array.from({length:operationAvailableMonth},(_,index)=>index+1).join(',')).split(',');
+  const savedOperationMonths = localStorage.getItem('enso-operation-months');
+  const operationSelected = (operationParams.get('meses') || savedOperationMonths || Array.from({length:operationAvailableMonth},(_,index)=>index+1).join(',')).split(',');
   document.querySelector('.kpi-grid').insertAdjacentHTML('beforebegin', `<div class="operation-month-only"><label>Meses<select id="operationMonths" multiple size="1">${operationMonthNames.slice(0,operationAvailableMonth).map((name,index) => `<option value="${index+1}" ${operationSelected.includes(String(index+1))?'selected':''}>${name}</option>`).join('')}</select></label></div>`);
   const operationMonths = document.querySelector('#operationMonths');
   const loadOperationData = () => {
@@ -332,6 +333,9 @@ if (monthlyBars) {
     document.querySelector('.chart-panel .panel-head').insertAdjacentHTML('beforeend', '<div class="bar-legend" aria-label="Legenda do gráfico"><span><i></i><b>Azul</b> · Dentro da meta</span><span><i></i><b>Vermelho</b> · Fora da meta</span></div>');
   }).catch(() => { monthlyBars.innerHTML = '<p class="loading">Não foi possível carregar o volume mensal.</p>'; });
   };
-  operationMonths.addEventListener('change', loadOperationData);
+  operationMonths.addEventListener('change', () => {
+    localStorage.setItem('enso-operation-months', [...operationMonths.selectedOptions].map(option => option.value).join(','));
+    loadOperationData();
+  });
   loadOperationData();
 }
