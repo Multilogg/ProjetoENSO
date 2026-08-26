@@ -37,6 +37,11 @@ localStorage.setItem('enso-theme', 'multilog');
 const topbar = document.querySelector('.topbar');
 let lastScrollPosition = window.scrollY;
 let scrollFramePending = false;
+const syncTopbarPosition = () => {
+  const currentScrollPosition = Math.max(window.scrollY, 0);
+  if (currentScrollPosition <= 120) topbar?.classList.remove('topbar-hidden');
+  lastScrollPosition = currentScrollPosition;
+};
 window.addEventListener('scroll', () => {
   if (scrollFramePending) return;
   scrollFramePending = true;
@@ -44,11 +49,18 @@ window.addEventListener('scroll', () => {
     const currentScrollPosition = window.scrollY;
     const scrollingDown = currentScrollPosition > lastScrollPosition;
     topbar?.classList.toggle('topbar-hidden', scrollingDown && currentScrollPosition > 90);
-    if (currentScrollPosition < 24) topbar?.classList.remove('topbar-hidden');
+    if (currentScrollPosition <= 120) topbar?.classList.remove('topbar-hidden');
     lastScrollPosition = Math.max(currentScrollPosition, 0);
     scrollFramePending = false;
   });
 }, { passive: true });
+window.addEventListener('pageshow', () => requestAnimationFrame(syncTopbarPosition));
+window.addEventListener('focus', syncTopbarPosition);
+window.addEventListener('resize', syncTopbarPosition, { passive: true });
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) requestAnimationFrame(syncTopbarPosition);
+});
+requestAnimationFrame(syncTopbarPosition);
 
 const originGoals = document.querySelector('.project-origin .origin-goals');
 if (originGoals) {
