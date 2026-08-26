@@ -56,9 +56,7 @@ if (originGoals) {
     ['Carregamento geral','0h40','0h35','Término OS − Início OS'],
     ['Processo DTA','1h50','1h10','Término OS − Início OS'],
     ['DTA-S · Marítimo','2h30','1h50','Término OS − Início OS'],
-    ['DTA-S · Aéreo','1h40','1h05','Término OS − Início OS'],
-    ['Presença DTA','12h00','12h00','Presença − Entrada'],
-    ['Presença DTA-S','4h00','3h30','Presença − Entrada']
+    ['DTA-S · Aéreo','1h40','1h05','Término OS − Início OS']
   ];
   document.querySelector('.project-origin .origin-intro h2').textContent = 'A evolução das metas operacionais';
   document.querySelector('.project-origin .origin-intro>p:last-child').textContent = 'As regras PTO mostram o ponto de partida do primeiro semestre e a nova referência ENSO, com critérios claros e comparáveis para cada processo.';
