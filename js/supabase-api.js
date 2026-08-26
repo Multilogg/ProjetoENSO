@@ -150,10 +150,4 @@
     } catch (error) { return jsonResponse({ erro: error.message }, 503); }
   };
 
-  window.addEventListener('DOMContentLoaded', () => {
-    if (!['localhost', '127.0.0.1'].includes(location.hostname)) {
-      const panel = document.querySelector('.import-panel');
-      if (panel) panel.style.display = 'none';
-    }
-  });
 })();
