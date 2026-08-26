@@ -1,4 +1,9 @@
 .danger-kpi { position: relative; }
+@media (min-width: 1101px) {
+  .indicator-kpi-row {
+    grid-template-columns: 1.16fr .96fr .96fr .96fr 1.22fr;
+  }
+}
 .indicator-kpi-row .time-kpi {
   position: relative;
   display: flex;
@@ -8,13 +13,14 @@
 .kpi-goal-badges {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px;
+  gap: 0;
   width: 100%;
   margin-top: auto;
-  padding-top: 11px;
-  border-top: 1px solid #e2eaf2;
+  border: 1px solid #d7e4ee;
+  border-radius: 10px;
+  overflow: hidden;
 }
-.indicator-kpi-row .time-kpi > p { margin-bottom: 14px; }
+.indicator-kpi-row .time-kpi > p { margin-bottom: 13px; }
 .indicator-kpi-row .time-kpi .enso-goal {
   position: static;
   display: flex;
@@ -22,13 +28,14 @@
   justify-content: space-between;
   gap: 5px;
   min-width: 0;
-  min-height: 28px;
-  padding: 5px 8px;
-  border-color: #cfe2ef;
-  border-radius: 10px;
-  background: linear-gradient(145deg, #f1f8fd, #e8f2fa);
+  min-height: 36px;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 0;
+  background: #eef6fb;
   color: #52718f;
-  font-size: 6.5px;
+  font-size: 7.5px;
+  font-weight: 600;
   line-height: 1.1;
   letter-spacing: .02em;
   margin-top: 0;
@@ -38,12 +45,12 @@
   flex: 0 0 auto;
   margin: 0;
   color: #15528e;
-  font: 700 10px Manrope, sans-serif;
+  font: 700 12px Manrope, sans-serif;
   letter-spacing: -.02em;
 }
 .indicator-kpi-row .time-kpi .real-goal {
-  border-color: #cce8df;
-  background: linear-gradient(145deg, #f0faf7, #e5f5f0);
+  border-right: 1px solid #d7e4ee;
+  background: #edf8f4;
   color: #4f776b;
 }
 .indicator-kpi-row .time-kpi .real-goal b { color: #187d68; }
