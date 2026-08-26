@@ -8,10 +8,13 @@
 .kpi-goal-badges {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 7px;
+  gap: 6px;
   width: 100%;
   margin-top: auto;
+  padding-top: 11px;
+  border-top: 1px solid #e2eaf2;
 }
+.indicator-kpi-row .time-kpi > p { margin-bottom: 14px; }
 .indicator-kpi-row .time-kpi .enso-goal {
   position: static;
   display: flex;
@@ -19,12 +22,13 @@
   justify-content: space-between;
   gap: 5px;
   min-width: 0;
-  padding: 8px 9px;
+  min-height: 28px;
+  padding: 5px 8px;
   border-color: #cfe2ef;
   border-radius: 10px;
   background: linear-gradient(145deg, #f1f8fd, #e8f2fa);
   color: #52718f;
-  font-size: 7px;
+  font-size: 6.5px;
   line-height: 1.1;
   letter-spacing: .02em;
   margin-top: 0;
@@ -34,7 +38,7 @@
   flex: 0 0 auto;
   margin: 0;
   color: #15528e;
-  font: 700 11px Manrope, sans-serif;
+  font: 700 10px Manrope, sans-serif;
   letter-spacing: -.02em;
 }
 .indicator-kpi-row .time-kpi .real-goal {
