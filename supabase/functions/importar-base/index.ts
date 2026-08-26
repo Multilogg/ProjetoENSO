@@ -1,4 +1,3 @@
-import * as XLSX from "npm:xlsx@0.18.5";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const cors = {
@@ -19,6 +18,50 @@ const aliases: Record<string, string[]> = {
 const text = (value: unknown) => value == null ? "" : String(value).trim();
 const upper = (value: unknown) => text(value).toLocaleUpperCase("pt-BR");
 const orderNumber = (value: unknown) => text(value).replace(/\.0+$/, "");
+
+function rk(value: number) {
+  const divided = (value & 1) !== 0;
+  const integer = (value & 2) !== 0;
+  let result: number;
+  if (integer) result = value >> 2;
+  else {
+    const bytes = new ArrayBuffer(8);
+    const view = new DataView(bytes);
+    view.setUint32(4, value & 0xfffffffc, true);
+    result = view.getFloat64(0, true);
+  }
+  return divided ? result / 100 : result;
+}
+
+function* biffRows(buffer: ArrayBuffer): Generator<unknown[]> {
+  const view = new DataView(buffer);
+  const decoder = new TextDecoder("windows-1252");
+  let position = 0;
+  let currentRow: number | null = null;
+  let current: unknown[] = [];
+  while (position + 4 <= view.byteLength) {
+    const record = view.getUint16(position, true);
+    const length = view.getUint16(position + 2, true);
+    const body = position + 4;
+    position = body + length;
+    if (position > view.byteLength) break;
+    let row: number, column: number, value: unknown;
+    if (record === 0x0204 && length >= 8) {
+      row = view.getUint16(body, true); column = view.getUint16(body + 2, true);
+      const size = view.getUint16(body + 6, true);
+      value = decoder.decode(new Uint8Array(buffer, body + 8, Math.min(size, length - 8))).trim();
+    } else if (record === 0x0203 && length >= 14) {
+      row = view.getUint16(body, true); column = view.getUint16(body + 2, true);
+      value = view.getFloat64(body + 6, true);
+    } else if (record === 0x027e && length >= 10) {
+      row = view.getUint16(body, true); column = view.getUint16(body + 2, true);
+      value = rk(view.getUint32(body + 6, true));
+    } else continue;
+    if (currentRow !== null && row !== currentRow) { yield current; current = []; }
+    currentRow = row; current[column] = value;
+  }
+  if (currentRow !== null) yield current;
+}
 
 function excelDate(value: unknown): Date | null {
   if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
@@ -52,9 +95,16 @@ Deno.serve(async request => {
     if (!/\.xlsx?$/i.test(file.name)) return json({ erro: "O arquivo deve ser .xls ou .xlsx." }, 400);
     if (file.size > 25 * 1024 * 1024) return json({ erro: "O arquivo deve ter no máximo 25 MB." }, 413);
 
-    const workbook = XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: true });
-    const sheetName = workbook.SheetNames.find(name => name.trim().toLocaleLowerCase("pt-BR").startsWith("basedados")) || workbook.SheetNames[0];
-    const rows = XLSX.utils.sheet_to_json<unknown[]>(workbook.Sheets[sheetName], { header: 1, defval: "", raw: true });
+    let rows: unknown[][];
+    const fileBuffer = await file.arrayBuffer();
+    if (/\.xls$/i.test(file.name)) {
+      rows = [...biffRows(fileBuffer)];
+    } else {
+      const XLSX = await import("npm:xlsx@0.18.5");
+      const workbook = XLSX.read(fileBuffer, { type: "array", cellDates: true });
+      const sheetName = workbook.SheetNames.find(name => name.trim().toLocaleLowerCase("pt-BR").startsWith("basedados")) || workbook.SheetNames[0];
+      rows = XLSX.utils.sheet_to_json<unknown[]>(workbook.Sheets[sheetName], { header: 1, defval: "", raw: true });
+    }
     if (!rows.length) return json({ erro: "A planilha está vazia." }, 400);
 
     const header = rows[0].map(value => text(value).toLocaleLowerCase("pt-BR"));
