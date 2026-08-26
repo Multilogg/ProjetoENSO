@@ -62,13 +62,14 @@
 .outside-goal-toolbar input { width: 100%; height: 42px; padding: 0 13px; border: 1px solid #cfdceb; border-radius: 11px; background: #f9fbfd; color: #173462; font: 500 13px DM Sans, sans-serif; }
 .outside-goal-toolbar strong { white-space: nowrap; color: #c9584c; }
 .outside-goal-table-wrap { margin: 0 28px 28px; border: 1px solid #dbe5f0; border-radius: 15px; overflow: auto; }
-.outside-goal-table { width: 100%; min-width: 1050px; border-collapse: collapse; font-size: 12px; }
+.outside-goal-table { width: 100%; min-width: 1180px; border-collapse: collapse; font-size: 12px; }
 .outside-goal-table th { position: sticky; top: 0; z-index: 1; padding: 12px 14px; background: #edf4fb; color: #426187; text-align: left; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
 .outside-goal-table td { padding: 12px 14px; border-top: 1px solid #e3eaf2; color: #4c6380; }
 .outside-goal-table tbody tr:nth-child(even) { background: #f9fbfd; }
 .outside-goal-table td:first-child strong { color: #214e88; }
 .outside-goal-table td:nth-child(2) { min-width: 250px; }
 .outside-goal-table td small { display: block; margin-top: 2px; color: #8393a8; }
+.outside-date { min-width: 154px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .outside-delay { white-space: nowrap; color: #c9584c; }
 .outside-goal-empty { height: 150px; text-align: center; color: #71849b !important; }
 

@@ -256,17 +256,19 @@ if (monthlyBars) {
     const minutes = Math.max(0, Math.round(Number(value)));
     return `${Math.floor(minutes / 60)}h ${String(minutes % 60).padStart(2, '0')}`;
   };
-  const formatOperationDate = (value, extraDays = 0) => {
+  const formatOperationDateTime = (value, totalSeconds = null) => {
     if (!value) return '—';
-    const date = new Date(value);
-    date.setUTCDate(date.getUTCDate() + extraDays);
-    return new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' }).format(date);
+    const raw = String(value);
+    const date = totalSeconds === null
+      ? new Date(`${raw}${/[zZ]|[+-]\d\d:\d\d$/.test(raw) ? '' : 'Z'}`)
+      : new Date(`${raw.slice(0, 10)}T00:00:00Z`);
+    if (totalSeconds !== null) date.setUTCSeconds(Math.round(totalSeconds));
+    return new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'UTC', day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+    }).format(date).replace(',', '');
   };
-  const formatOperationClock = totalMinutes => {
-    const normalized = ((Math.round(totalMinutes) % 1440) + 1440) % 1440;
-    return `${String(Math.floor(normalized / 60)).padStart(2, '0')}:${String(normalized % 60).padStart(2, '0')}`;
-  };
-  document.body.insertAdjacentHTML('beforeend', `<dialog class="outside-goal-dialog" id="outsideGoalDialog" aria-labelledby="outsideGoalTitle"><div class="outside-goal-shell"><header><div><span>DETALHAMENTO OPERACIONAL</span><h2 id="outsideGoalTitle">OS fora da meta</h2><p id="outsideGoalSubtitle"></p></div><button class="outside-goal-close" type="button" aria-label="Fechar">×</button></header><div class="outside-goal-toolbar"><label>Buscar OS ou cliente<input id="outsideGoalSearch" type="search" placeholder="Digite para filtrar..."></label><strong id="outsideGoalCount"></strong></div><div class="outside-goal-table-wrap"><table class="outside-goal-table"><thead><tr><th>OS</th><th>Cliente</th><th>Modal</th><th>Data</th><th>Início</th><th>Término</th><th>Tempo</th><th>Meta</th><th>Atraso</th></tr></thead><tbody id="outsideGoalRows"></tbody></table></div></div></dialog>`);
+  document.body.insertAdjacentHTML('beforeend', `<dialog class="outside-goal-dialog" id="outsideGoalDialog" aria-labelledby="outsideGoalTitle"><div class="outside-goal-shell"><header><div><span>DETALHAMENTO OPERACIONAL</span><h2 id="outsideGoalTitle">OS fora da meta</h2><p id="outsideGoalSubtitle"></p></div><button class="outside-goal-close" type="button" aria-label="Fechar">×</button></header><div class="outside-goal-toolbar"><label>Buscar OS ou cliente<input id="outsideGoalSearch" type="search" placeholder="Digite para filtrar..."></label><strong id="outsideGoalCount"></strong></div><div class="outside-goal-table-wrap"><table class="outside-goal-table"><thead><tr><th>OS</th><th>Cliente</th><th>Modal</th><th>Data/Geração</th><th>Data/Início</th><th>Data/Término</th><th>Tempo</th><th>Meta</th><th>Atraso</th></tr></thead><tbody id="outsideGoalRows"></tbody></table></div></div></dialog>`);
   const outsideGoalDialog = document.querySelector('#outsideGoalDialog');
   const outsideGoalRows = document.querySelector('#outsideGoalRows');
   const outsideGoalSearch = document.querySelector('#outsideGoalSearch');
@@ -276,12 +278,11 @@ if (monthlyBars) {
     const visible = currentOutsideGoalRows.filter(item => !query || `${item.os} ${item.cliente} ${item.modal}`.toLocaleLowerCase('pt-BR').includes(query));
     document.querySelector('#outsideGoalCount').textContent = `${formatMonthly(visible.length)} OS`;
     outsideGoalRows.innerHTML = visible.length ? visible.map(item => {
-      const start = Math.round(Number(item.horario || 0) * 60);
+      const start = Number(item.horario || 0) * 3600;
       const duration = Number(item.tempo_os_min || 0);
-      const finish = start + duration;
-      const finishDays = Math.floor(finish / 1440);
+      const finish = start + duration * 60;
       const delay = item.meta_min === null ? null : Math.max(0, duration - Number(item.meta_min));
-      return `<tr><td><strong>${escapeOperationDetail(item.os || '—')}</strong></td><td>${escapeOperationDetail(item.cliente || 'NÃO INFORMADO')}</td><td>${escapeOperationDetail(item.modal || '—')}</td><td>${formatOperationDate(item.data_operacao)}</td><td>${formatOperationClock(start)}</td><td><span>${formatOperationClock(finish)}</span>${finishDays ? `<small>${formatOperationDate(item.data_operacao, finishDays)}</small>` : ''}</td><td>${formatDetailMinutes(duration)}</td><td>${formatDetailMinutes(item.meta_min)}</td><td><b class="outside-delay">${delay === null ? '—' : `+${formatDetailMinutes(delay)}`}</b></td></tr>`;
+      return `<tr><td><strong>${escapeOperationDetail(item.os || '—')}</strong></td><td>${escapeOperationDetail(item.cliente || 'NÃO INFORMADO')}</td><td>${escapeOperationDetail(item.modal || '—')}</td><td class="outside-date">${formatOperationDateTime(item.data_operacao)}</td><td class="outside-date">${formatOperationDateTime(item.data_operacao, start)}</td><td class="outside-date">${formatOperationDateTime(item.data_operacao, finish)}</td><td>${formatDetailMinutes(duration)}</td><td>${formatDetailMinutes(item.meta_min)}</td><td><b class="outside-delay">${delay === null ? '—' : `+${formatDetailMinutes(delay)}`}</b></td></tr>`;
     }).join('') : '<tr><td colspan="9" class="outside-goal-empty">Nenhuma OS encontrada.</td></tr>';
   };
   const openOutsideGoalDetails = (indicator, label) => {
@@ -297,7 +298,7 @@ if (monthlyBars) {
       return response.json();
     }).then(rows => {
       currentOutsideGoalRows = rows;
-      document.querySelector('#outsideGoalSubtitle').textContent = 'Data e horários da operação, duração, limite aplicável e atraso.';
+      document.querySelector('#outsideGoalSubtitle').textContent = 'Datas no padrão SARA, duração, limite aplicável e atraso.';
       renderOutsideGoalRows();
     }).catch(() => {
       currentOutsideGoalRows = [];
