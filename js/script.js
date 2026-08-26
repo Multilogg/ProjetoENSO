@@ -34,14 +34,7 @@ document.body.classList.remove('dark');
 document.body.dataset.theme = 'multilog';
 localStorage.setItem('enso-theme', 'multilog');
 
-const topbar = document.querySelector('.topbar');
-const keepTopbarVisible = () => topbar?.classList.remove('topbar-hidden');
-keepTopbarVisible();
-window.addEventListener('pageshow', keepTopbarVisible);
-window.addEventListener('focus', keepTopbarVisible);
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) keepTopbarVisible();
-});
+document.querySelector('.topbar')?.classList.remove('topbar-hidden');
 
 const originGoals = document.querySelector('.project-origin .origin-goals');
 if (originGoals) {
