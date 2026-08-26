@@ -28,13 +28,13 @@
   justify-content: space-between;
   gap: 5px;
   min-width: 0;
-  min-height: 36px;
-  padding: 7px 9px;
+  min-height: 29px;
+  padding: 4px 9px;
   border: 0;
   border-radius: 0;
   background: #eef6fb;
   color: #52718f;
-  font-size: 7.5px;
+  font-size: 8px;
   font-weight: 600;
   line-height: 1.1;
   letter-spacing: .02em;
@@ -45,7 +45,7 @@
   flex: 0 0 auto;
   margin: 0;
   color: #15528e;
-  font: 700 12px Manrope, sans-serif;
+  font: 700 13px Manrope, sans-serif;
   letter-spacing: -.02em;
 }
 .indicator-kpi-row .time-kpi .real-goal {
