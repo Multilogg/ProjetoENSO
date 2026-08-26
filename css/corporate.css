@@ -475,3 +475,17 @@ body[data-theme="multilog"] .semester-page .tools b{color:#174b89}
 
 /* Evita exibir o painel executivo antigo antes da leitura do banco online. */
 body.operation-page .kpi-grid{visibility:hidden;min-height:300px}
+
+/* Status do plano de ação: cores distintas e legíveis. */
+body[data-theme="multilog"] .semester-page .status-select[data-status="delivered"]{
+  background:#d9f4e8!important;color:#08765f!important;border-color:#83d4bd!important;
+  box-shadow:inset 4px 0 0 #18a47f,0 4px 12px rgba(24,164,127,.08)!important
+}
+body[data-theme="multilog"] .semester-page .status-select[data-status="progress"]{
+  background:#fff1c9!important;color:#8a5a00!important;border-color:#e9c661!important;
+  box-shadow:inset 4px 0 0 #e2a91f,0 4px 12px rgba(226,169,31,.08)!important
+}
+body[data-theme="multilog"] .semester-page .status-select[data-status="late"]{
+  background:#ffe1de!important;color:#a9342b!important;border-color:#efa099!important;
+  box-shadow:inset 4px 0 0 #df5549,0 4px 12px rgba(223,85,73,.08)!important
+}
