@@ -1,59 +1,10 @@
 .danger-kpi { position: relative; }
-@media (min-width: 1101px) {
-  .indicator-kpi-row {
-    grid-template-columns: 1.16fr .96fr .96fr .96fr 1.22fr;
-  }
-}
 .indicator-kpi-row .time-kpi {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
-.kpi-goal-badges {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0;
-  width: 100%;
-  margin-top: auto;
-  border: 1px solid #d7e4ee;
-  border-radius: 10px;
-  overflow: hidden;
-}
-.indicator-kpi-row .time-kpi > p { margin-bottom: 13px; }
-.indicator-kpi-row .time-kpi .enso-goal {
-  position: static;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 5px;
-  min-width: 0;
-  min-height: 29px;
-  padding: 4px 9px;
-  border: 0;
-  border-radius: 0;
-  background: #eef6fb;
-  color: #52718f;
-  font-size: 8px;
-  font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: .02em;
-  margin-top: 0;
-  white-space: nowrap;
-}
-.indicator-kpi-row .time-kpi .enso-goal b {
-  flex: 0 0 auto;
-  margin: 0;
-  color: #15528e;
-  font: 700 13px Manrope, sans-serif;
-  letter-spacing: -.02em;
-}
-.indicator-kpi-row .time-kpi .real-goal {
-  border-right: 1px solid #d7e4ee;
-  background: #edf8f4;
-  color: #4f776b;
-}
-.indicator-kpi-row .time-kpi .real-goal b { color: #187d68; }
 .kpi-goal-status {
   position: absolute;
   top: 17px;
@@ -63,10 +14,41 @@
   border: 2px solid #fff;
   border-radius: 50%;
   box-shadow: 0 0 0 4px rgba(94, 115, 139, .1);
+  cursor: help;
+  outline: none;
 }
 .kpi-goal-status.is-inside { background: #25a875; box-shadow: 0 0 0 4px rgba(37, 168, 117, .14), 0 3px 10px rgba(37, 168, 117, .24); }
 .kpi-goal-status.is-outside { background: #dc5a52; box-shadow: 0 0 0 4px rgba(220, 90, 82, .14), 0 3px 10px rgba(220, 90, 82, .22); }
 .kpi-goal-status.is-empty { background: #9aaabd; }
+.kpi-goal-status::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  z-index: 5;
+  top: 22px;
+  right: -5px;
+  width: max-content;
+  max-width: 230px;
+  padding: 9px 11px;
+  border: 1px solid #d8e3ee;
+  border-radius: 9px;
+  background: #123d70;
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(16, 48, 86, .2);
+  font: 600 10px/1.35 "DM Sans", sans-serif;
+  font-style: normal;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity .16s ease, transform .16s ease, visibility .16s ease;
+  pointer-events: none;
+}
+.kpi-goal-status:hover::after,
+.kpi-goal-status:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
 
 .outside-goal-open {
   position: absolute;
