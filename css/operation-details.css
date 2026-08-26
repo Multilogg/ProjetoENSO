@@ -62,6 +62,8 @@
 }
 .kpi-goal-tooltip b:first-child { background: #edf8f4; color: #267560; }
 .kpi-goal-tooltip b:last-child { background: #edf5fb; color: #255b91; }
+.kpi-goal-tooltip.is-outside b:first-child { background: #fff0ee; color: #bd4d45; }
+.kpi-goal-tooltip.is-empty b:first-child { background: #f1f4f7; color: #718197; }
 .indicator-kpi-row .time-kpi .kpi-goal-tooltip small {
   display: inline;
   margin: 0;
