@@ -1,20 +1,3 @@
-const sharedNavigation = document.createElement('link');
-sharedNavigation.rel = 'stylesheet';
-sharedNavigation.href = location.pathname.includes('/paginas/') ? '../css/navigation.css' : 'css/navigation.css';
-document.head.appendChild(sharedNavigation);
-
-const corporateTheme = document.createElement('link');
-corporateTheme.rel = 'stylesheet';
-corporateTheme.href = location.pathname.includes('/paginas/') ? '../css/corporate.css' : 'css/corporate.css';
-document.head.appendChild(corporateTheme);
-
-if (document.querySelector('.status-select')) {
-  const statusStyles = document.createElement('link');
-  statusStyles.rel = 'stylesheet';
-  statusStyles.href = '../css/status.css';
-  document.head.appendChild(statusStyles);
-}
-
 const themeButton = document.querySelector('#themeToggle');
 document.querySelectorAll('.brand small').forEach(subtitle => {
   subtitle.textContent = 'Elevação do Nível de Serviço Operacional';
