@@ -75,10 +75,9 @@ function excelDate(value: unknown): Date | null {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
-function goal(indicator: string, date: Date | null) {
-  const first: Record<string, number> = { "CARREGAMENTO GERAL": 40, DTA: 110, "DTA-S MARITIMO": 150, "DTA-S AEREO": 100 };
-  const second: Record<string, number> = { "CARREGAMENTO GERAL": 35, DTA: 70, "DTA-S MARITIMO": 110, "DTA-S AEREO": 65 };
-  return (date && date.getMonth() >= 6 ? second : first)[indicator] ?? null;
+function goal(indicator: string) {
+  const real: Record<string, number> = { "CARREGAMENTO GERAL": 40, DTA: 110, "DTA-S MARITIMO": 150, "DTA-S AEREO": 100 };
+  return real[indicator] ?? null;
 }
 
 function json(payload: unknown, status = 200) {
@@ -144,7 +143,7 @@ Deno.serve(async request => {
       const duration = start && finish ? (finish.getTime() - start.getTime()) / 60000 : null;
       const permanence = entry && departure && departure > entry ? (departure.getTime() - entry.getTime()) / 60000 : null;
       const goalIndicator = operationType === "ENTRADA" && document !== "DTA-S" ? "DTA" : indicator;
-      const applicableGoal = goal(goalIndicator, entry);
+      const applicableGoal = goal(goalIndicator);
       let status = text(get("status")) || "NÃO INFORMADO";
       if (applicableGoal !== null) {
         status = duration === null || duration <= applicableGoal ? "Dentro da Meta" : "Fora da Meta";

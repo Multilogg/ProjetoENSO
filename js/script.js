@@ -62,7 +62,7 @@ if (originGoals) {
   ];
   document.querySelector('.project-origin .origin-intro h2').textContent = 'A evolução das metas operacionais';
   document.querySelector('.project-origin .origin-intro>p:last-child').textContent = 'As regras PTO mostram o ponto de partida do primeiro semestre e a nova referência ENSO, com critérios claros e comparáveis para cada processo.';
-  originGoals.innerHTML = ptoRules.map(([title,initial,current,formula]) => `<article class="pto-rule"><span>${title}</span><div class="goal-evolution"><div><small>1º semestre</small><strong>${initial}</strong></div><i>→</i><div><small>Meta ENSO</small><strong>${current}</strong></div></div><p><b>Cálculo</b>${formula}</p></article>`).join('');
+  originGoals.innerHTML = ptoRules.map(([title,initial,current,formula]) => `<article class="pto-rule"><span>${title}</span><div class="goal-evolution"><div><small>Meta real</small><strong>${initial}</strong></div><i>→</i><div><small>Objetivo ENSO</small><strong>${current}</strong></div></div><p><b>Cálculo</b>${formula}</p></article>`).join('');
 }
 
 const showAll = document.querySelector('#showAll');
@@ -344,7 +344,7 @@ if (monthlyBars) {
       kpiContainer.querySelectorAll('.indicator-kpi-section').forEach((section, index) => {
         const timeCard = section.querySelector('.indicator-kpi-row .kpi:last-child');
         timeCard.classList.add('time-kpi');
-        timeCard.insertAdjacentHTML('beforeend', `<small class="enso-goal">Meta ENSO <b>${indicatorGoals[index]}</b></small>`);
+        timeCard.insertAdjacentHTML('beforeend', `<small class="enso-goal">Objetivo ENSO <b>${indicatorGoals[index]}</b></small>`);
       });
       kpiContainer.querySelectorAll('.outside-goal-open').forEach(button => button.addEventListener('click', () => openOutsideGoalDetails(button.dataset.indicator, button.dataset.label)));
     }

@@ -3,10 +3,16 @@
   if (!config?.url || !config?.publishableKey) return;
   const nativeFetch = window.fetch.bind(window);
   const pageSize = 1000;
-  const cachePrefix = 'enso-supabase-cache:';
+  const cachePrefix = 'enso-supabase-cache-v2:';
   let operationsPromise;
   let versionPromise;
   const num = value => Number(value) || 0;
+  const realGoals = { 'CARREGAMENTO GERAL': 40, DTA: 110, 'DTA-S MARITIMO': 150, 'DTA-S AEREO': 100 };
+  const realGoal = row => String(row.tipo_operacao || '').toUpperCase() === 'ENTRADA' && String(row.documento || '').toUpperCase() !== 'DTA-S'
+    ? realGoals.DTA : (realGoals[row.indicador] ?? null);
+  const isAnalyzable = row => realGoal(row) !== null && row.tempo_os_min !== null && num(row.tempo_os_min) >= 0;
+  const isOutside = row => isAnalyzable(row) && num(row.tempo_os_min) > realGoal(row);
+  const isInside = row => isAnalyzable(row) && num(row.tempo_os_min) <= realGoal(row);
   const monthOf = value => value ? Number(String(value).slice(5, 7)) : 0;
   const yearOf = value => value ? Number(String(value).slice(0, 4)) : 0;
   const periodOf = value => {
@@ -44,7 +50,7 @@
     if (operationsPromise) return operationsPromise;
     operationsPromise = (async () => {
       const rows = [];
-      const fields = 'os,cliente,indicador,modal,horario,status_meta,regime,data_operacao,tempo_os_min,meta_min';
+      const fields = 'os,cliente,indicador,documento,modal,horario,status_meta,tipo_operacao,regime,data_operacao,tempo_os_min,meta_min';
       for (let offset = 0; ; offset += pageSize) {
         const result = await nativeFetch(`${config.url}/rest/v1/operacoes?select=${fields}&offset=${offset}&limit=${pageSize}`, {
           headers: { apikey: config.publishableKey, Authorization: `Bearer ${config.publishableKey}` }
@@ -65,7 +71,7 @@
       const name = key(row) || 'NÃO INFORMADO';
       const item = map.get(name) || { nome: name, total: 0, fora: 0 };
       item.total++;
-      if (row.status_meta === 'Fora da Meta') item.fora++;
+      if (isOutside(row)) item.fora++;
       map.set(name, item);
     });
     return [...map.values()].map(item => ({ ...item,
@@ -87,7 +93,7 @@
         (months.length || semester !== '2' || (month >= 7 && month <= 12)) &&
         (!period || periodOf(row.horario) === period);
     });
-    const outside = filtered.filter(row => row.status_meta === 'Fora da Meta').length;
+    const outside = filtered.filter(isOutside).length;
     const clients = groups(filtered, row => row.cliente)
       .sort((a, b) => b.fora - a.fora || b.total - a.total || a.nome.localeCompare(b.nome, 'pt-BR'))
       .slice(0, 100).map(item => ({ ...item, cliente: item.nome }));
@@ -101,17 +107,17 @@
     const year = Math.max(...rows.map(row => yearOf(row.data_operacao)).filter(Boolean));
     const selected = (url.searchParams.get('meses') || '').split(',').map(Number).filter(value => value >= 1 && value <= 12);
     const filtered = rows.filter(row => yearOf(row.data_operacao) === year && (!selected.length || selected.includes(monthOf(row.data_operacao))));
-    const inside = filtered.filter(row => row.status_meta === 'Dentro da Meta').length;
-    const outside = filtered.filter(row => row.status_meta === 'Fora da Meta').length;
+    const inside = filtered.filter(isInside).length;
+    const outside = filtered.filter(isOutside).length;
     const durations = filtered.filter(row => row.tempo_os_min !== null && num(row.tempo_os_min) >= 0).map(row => num(row.tempo_os_min));
     const monthly = groups(filtered, row => monthOf(row.data_operacao)).map(item => ({ mes: Number(item.nome), total: item.total,
-      dentro: filtered.filter(row => monthOf(row.data_operacao) === Number(item.nome) && row.status_meta === 'Dentro da Meta').length,
+      dentro: filtered.filter(row => monthOf(row.data_operacao) === Number(item.nome) && isInside(row)).length,
       fora: item.fora })).sort((a, b) => a.mes - b.mes);
     const clientes = groups(filtered, row => row.cliente).slice(0, 8).map(item => ({ cliente: item.nome, total: item.total }));
     const indicadores = ['CARREGAMENTO GERAL','DTA','DTA-S MARITIMO','DTA-S AEREO'].map(indicador => {
       const items = filtered.filter(row => row.indicador === indicador);
-      const dentro = items.filter(row => row.status_meta === 'Dentro da Meta').length;
-      const fora = items.filter(row => row.status_meta === 'Fora da Meta').length;
+      const dentro = items.filter(isInside).length;
+      const fora = items.filter(isOutside).length;
       const times = items.filter(row => row.tempo_os_min !== null && num(row.tempo_os_min) >= 0).map(row => num(row.tempo_os_min));
       return { indicador, total: items.length, dentro, fora,
         aderencia: dentro + fora ? Math.round(dentro * 1000 / (dentro + fora)) / 10 : 0,
@@ -131,12 +137,12 @@
     const indicator = (url.searchParams.get('indicador') || '').toUpperCase();
     return rows.filter(row => yearOf(row.data_operacao) === year &&
       (!selected.length || selected.includes(monthOf(row.data_operacao))) &&
-      (!indicator || row.indicador === indicator) && row.status_meta === 'Fora da Meta')
+      (!indicator || row.indicador === indicator) && isOutside(row))
       .map(row => ({
         os: row.os, cliente: row.cliente, indicador: row.indicador, modal: row.modal,
         data_operacao: row.data_operacao, horario: num(row.horario),
         tempo_os_min: row.tempo_os_min === null ? null : num(row.tempo_os_min),
-        meta_min: row.meta_min === null ? null : num(row.meta_min)
+        meta_min: realGoal(row)
       }))
       .sort((a, b) => String(b.data_operacao || '').localeCompare(String(a.data_operacao || '')) || String(a.os).localeCompare(String(b.os)));
   }
