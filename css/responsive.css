@@ -158,13 +158,13 @@ input, select, button { max-width: 100%; }
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
 
-/* Comparativo ENSO: quatro processos, um card largo por linha. */
+/* Comparativo ENSO: quatro processos em uma grade 2 × 2. */
 .portal > .project-origin {
   grid-template-columns: minmax(260px, .72fr) minmax(0, 1.55fr) !important;
   align-items: start !important;
 }
 .portal > .project-origin .origin-goals {
-  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   gap: 14px !important;
 }
 .portal > .project-origin .pto-rule {
@@ -180,6 +180,7 @@ input, select, button { max-width: 100%; }
 }
 
 @media (max-width: 560px) {
+  .portal > .project-origin .origin-goals { grid-template-columns: minmax(0, 1fr) !important; }
   .portal > .project-origin .pto-rule { min-height: 140px !important; padding: 21px !important; }
   .portal > .project-origin .pto-rule .goal-evolution strong { font-size: 23px !important; }
 }
