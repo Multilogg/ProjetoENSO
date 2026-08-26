@@ -1,15 +1,41 @@
 .danger-kpi { position: relative; }
 .indicator-kpi-row .time-kpi {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
+.kpi-goal-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: auto;
+}
 .indicator-kpi-row .time-kpi .enso-goal {
   position: static;
   align-self: flex-start;
-  margin-top: auto;
+  margin-top: 0;
   white-space: nowrap;
 }
+.indicator-kpi-row .time-kpi .real-goal {
+  border-color: #cdddeb;
+  background: #edf5fb;
+  color: #55708e;
+}
+.indicator-kpi-row .time-kpi .real-goal b { color: #174b86; }
+.kpi-goal-status {
+  position: absolute;
+  top: 17px;
+  right: 17px;
+  width: 11px;
+  height: 11px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(94, 115, 139, .12);
+}
+.kpi-goal-status.is-inside { background: #2eaa72; box-shadow: 0 0 0 3px rgba(46, 170, 114, .15); }
+.kpi-goal-status.is-outside { background: #df5b52; box-shadow: 0 0 0 3px rgba(223, 91, 82, .15); }
+.kpi-goal-status.is-empty { background: #9aaabd; }
 .outside-goal-open {
   position: absolute;
   top: 14px;

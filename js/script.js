@@ -328,6 +328,8 @@ if (monthlyBars) {
     const durationLabel = `${Math.floor(duration / 60)}h ${String(duration % 60).padStart(2, '0')}`;
     document.querySelector('.hero .lead').textContent = `Volumes e perfil das ${formatMonthly(summary.total || 0)} ordens de serviço de ${data.ano}.`;
     const indicatorLabels = { 'CARREGAMENTO GERAL':'Carregamento geral', DTA:'Descarga DTA', 'DTA-S MARITIMO':'DTA-S Marítimo', 'DTA-S AEREO':'DTA-S Aéreo' };
+    const indicatorRealGoals = ['0h40','1h50','2h30','1h40'];
+    const indicatorRealGoalMinutes = [40,110,150,100];
     const indicatorGoals = ['0h35','1h10','1h50','1h05'];
     const indicatorOrder = ['CARREGAMENTO GERAL','DTA','DTA-S MARITIMO','DTA-S AEREO'];
     const indicatorMap = Object.fromEntries((data.indicadores || []).map(item => [item.indicador,item]));
@@ -343,8 +345,12 @@ if (monthlyBars) {
       }).join('');
       kpiContainer.querySelectorAll('.indicator-kpi-section').forEach((section, index) => {
         const timeCard = section.querySelector('.indicator-kpi-row .kpi:last-child');
+        const indicatorItem = indicatorMap[indicatorOrder[index]] || { total:0, tempo_medio:0 };
+        const hasAverage = indicatorItem.total > 0;
+        const withinRealGoal = hasAverage && indicatorItem.tempo_medio <= indicatorRealGoalMinutes[index];
         timeCard.classList.add('time-kpi');
-        timeCard.insertAdjacentHTML('beforeend', `<small class="enso-goal">Objetivo ENSO <b>${indicatorGoals[index]}</b></small>`);
+        timeCard.insertAdjacentHTML('afterbegin', `<i class="kpi-goal-status ${hasAverage ? (withinRealGoal ? 'is-inside' : 'is-outside') : 'is-empty'}" title="${hasAverage ? (withinRealGoal ? 'Tempo médio dentro da meta real' : 'Tempo médio fora da meta real') : 'Sem dados para avaliação'}" aria-label="${hasAverage ? (withinRealGoal ? 'Dentro da meta real' : 'Fora da meta real') : 'Sem dados'}"></i>`);
+        timeCard.insertAdjacentHTML('beforeend', `<div class="kpi-goal-badges"><small class="enso-goal real-goal">Meta real <b>${indicatorRealGoals[index]}</b></small><small class="enso-goal">Objetivo ENSO <b>${indicatorGoals[index]}</b></small></div>`);
       });
       kpiContainer.querySelectorAll('.outside-goal-open').forEach(button => button.addEventListener('click', () => openOutsideGoalDetails(button.dataset.indicator, button.dataset.label)));
     }
