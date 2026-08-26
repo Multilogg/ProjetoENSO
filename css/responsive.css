@@ -157,3 +157,29 @@ input, select, button { max-width: 100%; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+/* Comparativo ENSO: quatro processos, um card largo por linha. */
+.portal > .project-origin {
+  grid-template-columns: minmax(260px, .72fr) minmax(0, 1.55fr) !important;
+  align-items: start !important;
+}
+.portal > .project-origin .origin-goals {
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 14px !important;
+}
+.portal > .project-origin .pto-rule {
+  min-height: 150px !important;
+  padding: 25px 27px !important;
+}
+.portal > .project-origin .pto-rule > span { font-size: 11px !important; }
+.portal > .project-origin .pto-rule .goal-evolution strong { font-size: 27px !important; }
+.portal > .project-origin .pto-rule > p { font-size: 9px; }
+
+@media (max-width: 1100px) {
+  .portal > .project-origin { grid-template-columns: minmax(0, 1fr) !important; }
+}
+
+@media (max-width: 560px) {
+  .portal > .project-origin .pto-rule { min-height: 140px !important; padding: 21px !important; }
+  .portal > .project-origin .pto-rule .goal-evolution strong { font-size: 23px !important; }
+}
