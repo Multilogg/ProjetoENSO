@@ -299,7 +299,13 @@ if (monthlyBars) {
   const operationParams = new URLSearchParams(location.search);
   const savedOperationMonths = localStorage.getItem('enso-operation-months');
   const operationSelected = (operationParams.get('meses') || savedOperationMonths || Array.from({length:operationAvailableMonth},(_,index)=>index+1).join(',')).split(',');
-  document.querySelector('.kpi-grid').insertAdjacentHTML('beforebegin', `<div class="operation-overview-bar"><article class="operation-accuracy is-loading" id="operationAccuracy" aria-live="polite"><div><span>ACURACIDADE GERAL</span><strong>—</strong></div><p><b>Calculando</b><small>Média das 4 aderências · meta 84%</small></p></article><div class="operation-month-only"><label>Meses<select id="operationMonths" multiple size="1">${operationMonthNames.slice(0,operationAvailableMonth).map((name,index) => `<option value="${index+1}" ${operationSelected.includes(String(index+1))?'selected':''}>${name}</option>`).join('')}</select></label></div></div>`);
+  const operationMonthOptions = operationMonthNames.slice(0,operationAvailableMonth).map((name,index) => `<option value="${index+1}" ${operationSelected.includes(String(index+1))?'selected':''}>${name}</option>`).join('');
+  let operationOverview = document.querySelector('.operation-overview-bar');
+  if (!operationOverview) {
+    document.querySelector('.kpi-grid').insertAdjacentHTML('beforebegin', `<div class="operation-overview-bar"><article class="operation-accuracy is-loading" id="operationAccuracy" aria-live="polite"><div><span>ACURACIDADE GERAL</span><strong>—</strong></div><p><b>Calculando</b><small>Média das 4 aderências · meta 84%</small></p></article><div class="operation-month-only"><label>Meses<select id="operationMonths" multiple size="1"></select></label></div></div>`);
+    operationOverview = document.querySelector('.operation-overview-bar');
+  }
+  operationOverview.querySelector('#operationMonths').innerHTML = operationMonthOptions;
   const operationMonths = document.querySelector('#operationMonths');
   const loadOperationData = () => {
   const selectedMonths = [...operationMonths.selectedOptions].map(option => option.value);
