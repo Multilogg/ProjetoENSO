@@ -26,14 +26,19 @@
     status, headers: { 'Content-Type': 'application/json; charset=utf-8' }
   });
 
+  async function latestImport() {
+    const result = await nativeFetch(`${config.url}/rest/v1/importacoes?select=importado_em,registros,arquivo&order=id.desc&limit=1`, {
+      headers: { apikey: config.publishableKey, Authorization: `Bearer ${config.publishableKey}` }
+    });
+    if (!result.ok) throw new Error(`Supabase indisponível (${result.status})`);
+    const [latest] = await result.json();
+    return latest || null;
+  }
+
   async function currentVersion() {
     if (versionPromise) return versionPromise;
     versionPromise = (async () => {
-      const result = await nativeFetch(`${config.url}/rest/v1/importacoes?select=importado_em,registros&order=id.desc&limit=1`, {
-        headers: { apikey: config.publishableKey, Authorization: `Bearer ${config.publishableKey}` }
-      });
-      if (!result.ok) throw new Error(`Supabase indisponível (${result.status})`);
-      const [latest] = await result.json();
+      const latest = await latestImport();
       const version = latest ? `${latest.importado_em}:${latest.registros}` : 'sem-base';
       const previous = localStorage.getItem(`${cachePrefix}version`);
       if (previous && previous !== version) {
@@ -164,6 +169,7 @@
         }
         return jsonResponse(payload, result.status);
       }
+      if (target.startsWith('/api/ultima-importacao')) return jsonResponse(await latestImport());
       const version = await currentVersion();
       const cacheKey = `${cachePrefix}${target}`;
       const cached = localStorage.getItem(cacheKey);

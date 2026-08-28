@@ -50,6 +50,21 @@ const importMessage = document.querySelector('#importMessage');
 document.body.insertAdjacentHTML('beforeend', `<div class="import-loading" id="importLoading" hidden role="status" aria-live="polite" aria-label="Importação em andamento"><div class="import-loading-card"><span class="import-spinner" aria-hidden="true"></span><p class="eyebrow">ATUALIZANDO INDICADORES</p><strong>Processando nova base</strong><small>Lendo as O.S., removendo duplicidades e recalculando as metas. Não feche esta página.</small></div></div>`);
 const importLoading = document.querySelector('#importLoading');
 
+async function loadLastUpdate() {
+  try {
+    const response = await fetch('/api/ultima-importacao');
+    if (!response.ok) throw new Error('Data indisponível');
+    const latest = await response.json();
+    if (!latest?.importado_em) throw new Error('Sem importações');
+    const updatedAt = new Date(latest.importado_em).toLocaleString('pt-BR', {
+      day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+    elements.update.textContent = `${updatedAt} · ${format(latest.registros || 0)} O.S.`;
+  } catch {
+    elements.update.textContent = 'Data da última atualização indisponível';
+  }
+}
+
 spreadsheet.addEventListener('change', () => {
   fileName.textContent = spreadsheet.files[0]?.name || 'Nenhum arquivo selecionado';
   if (spreadsheet.files.length) importForm.requestSubmit();
@@ -71,6 +86,7 @@ importForm.addEventListener('submit', async event => {
     const duplicates = result.duplicados_descartados || 0;
     importMessage.textContent = `${format(result.registros)} O.S. únicas importadas; ${format(result.analisados)} analisadas; ${format(duplicates)} duplicidades descartadas.`;
     await loadData();
+    await loadLastUpdate();
   } catch (error) {
     importMessage.classList.add('error'); importMessage.textContent = error.message;
   } finally {
@@ -131,7 +147,6 @@ async function loadData() {
     const offendingClients = data.clientes.filter(item => Number(item.fora) > 0);
     elements.clientCount.textContent = `${offendingClients.length} clientes ofensores`;
     elements.customerRows.innerHTML = offendingClients.map(item => `<div class="customer-row"><span>${item.cliente}</span><span>${format(item.total)}</span><span>${format(item.fora)}</span>${rate(item.percentual)}</div>`).join('') || '<p class="loading">Nenhum cliente fora da meta no período.</p>';
-    elements.update.textContent = `${format(data.total)} registros na consulta atual`;
     if (!Array.isArray(data.regime)) {
       elements.error.querySelector('strong').textContent = 'O servidor precisa ser reiniciado.';
       elements.error.querySelector('span').innerHTML = 'Feche a janela antiga do servidor e abra novamente pelo <code>INICIAR_SITE.bat</code>.';
@@ -160,3 +175,4 @@ elements.semester.addEventListener('change', () => {
 });
 document.querySelector('#clearFilters').addEventListener('click', () => { elements.indicator.value='CARREGAMENTO GERAL'; elements.semester.value=''; elements.modal.value=''; elements.period.value=''; [...elements.months.options].forEach(option => { option.selected = option.value !== '__all__'; }); loadData(); });
 loadData();
+loadLastUpdate();

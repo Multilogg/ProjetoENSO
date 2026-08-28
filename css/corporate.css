@@ -49,7 +49,7 @@ main{max-width:1320px;padding-left:32px;padding-right:32px}
 footer{max-width:1320px;padding:34px 32px 46px}
 .api-error{border-radius:14px;box-shadow:0 20px 48px rgba(48,26,22,.2)}
 .pillar{scroll-margin-top:100px}.pillar:target{border-color:#8fca56;box-shadow:0 0 0 4px rgba(143,202,86,.12),var(--shadow)}
-.data-hero .db-status,#importButton{display:none}.import-panel{grid-template-columns:1fr auto}.import-panel form{justify-content:flex-end}.file-picker{min-width:270px}
+#importButton{display:none}.import-panel{grid-template-columns:1fr auto}.import-panel form{justify-content:flex-end}.file-picker{min-width:270px}
 body.dark{background:#0c1f1c}.dark .topbar{background:rgba(12,31,28,.88)}.dark .topbar nav a.active{background:#17312d}.dark .filter-bar select,.dark .filter-bar input,.dark .owner-select,.dark .deadline-input,.dark .status-select{background:#102723;border-color:#29433e}
 @media(max-width:1050px){.topbar{padding-left:24px;padding-right:24px}.topbar nav{border-top:1px solid var(--line)}main{padding-left:24px;padding-right:24px}}
 @media(max-width:800px){.hero,.data-hero{padding-top:42px}.panel{padding:24px}.enso-overview{padding:24px!important}.project-origin{padding:28px!important}.overview-pillars article,.overview-pillars article.last{grid-template-columns:40px minmax(0,1fr);padding:19px}.pillar-status{grid-column:2;justify-self:start}.filter-bar{padding:16px}}
