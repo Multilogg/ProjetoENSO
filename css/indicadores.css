@@ -6,9 +6,9 @@
 .filter-bar{grid-template-columns:1.15fr .75fr .9fr .9fr .9fr .9fr auto}
 .filter-bar{grid-template-columns:1.15fr .75fr .9fr .9fr 1.35fr auto}.month-filter{position:relative}.month-filter select{min-height:38px}.month-filter small{display:block;margin-top:4px;color:var(--muted);font-size:8px;font-weight:500;letter-spacing:0;text-transform:none}
 .data-page .filter-bar #clearFilters{align-self:start;margin-top:18px}
-.data-hero .db-status{min-width:250px;padding:14px 17px;border-color:#cfdae7;background:rgba(255,255,255,.78);box-shadow:0 10px 28px rgba(14,55,105,.07)}
-.data-hero .db-status b{color:#173f78;font-size:10px;letter-spacing:.03em}
-.data-hero .db-status small{color:#627994;font-size:9px;font-variant-numeric:tabular-nums}
+.data-hero .db-status{min-width:250px;padding:0;border:0;background:transparent;box-shadow:none;opacity:.72}
+.data-hero .db-status b{color:#173f78;font-size:11px;letter-spacing:.025em}
+.data-hero .db-status small{color:#536f90;font-size:10px;font-variant-numeric:tabular-nums}
 @media(max-width:1050px){.filter-bar{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:570px){.data-page .filter-bar #clearFilters{margin-top:0}}
 .data-layout.no-customers{grid-template-columns:1fr}
