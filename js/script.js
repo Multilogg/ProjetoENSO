@@ -299,7 +299,7 @@ if (monthlyBars) {
   const operationParams = new URLSearchParams(location.search);
   const savedOperationMonths = localStorage.getItem('enso-operation-months');
   const operationSelected = (operationParams.get('meses') || savedOperationMonths || Array.from({length:operationAvailableMonth},(_,index)=>index+1).join(',')).split(',');
-  document.querySelector('.kpi-grid').insertAdjacentHTML('beforebegin', `<div class="operation-month-only"><label>Meses<select id="operationMonths" multiple size="1">${operationMonthNames.slice(0,operationAvailableMonth).map((name,index) => `<option value="${index+1}" ${operationSelected.includes(String(index+1))?'selected':''}>${name}</option>`).join('')}</select></label></div>`);
+  document.querySelector('.kpi-grid').insertAdjacentHTML('beforebegin', `<div class="operation-overview-bar"><article class="operation-accuracy is-loading" id="operationAccuracy" aria-live="polite"><div><span>ACURACIDADE GERAL</span><strong>—</strong></div><p><b>Calculando</b><small>Média das 4 aderências · meta 84%</small></p></article><div class="operation-month-only"><label>Meses<select id="operationMonths" multiple size="1">${operationMonthNames.slice(0,operationAvailableMonth).map((name,index) => `<option value="${index+1}" ${operationSelected.includes(String(index+1))?'selected':''}>${name}</option>`).join('')}</select></label></div></div>`);
   const operationMonths = document.querySelector('#operationMonths');
   const loadOperationData = () => {
   const selectedMonths = [...operationMonths.selectedOptions].map(option => option.value);
@@ -318,6 +318,14 @@ if (monthlyBars) {
     const indicatorGoals = ['0h35','1h10','1h50','1h05'];
     const indicatorOrder = ['CARREGAMENTO GERAL','DTA','DTA-S MARITIMO','DTA-S AEREO'];
     const indicatorMap = Object.fromEntries((data.indicadores || []).map(item => [item.indicador,item]));
+    const accuracy = indicatorOrder.reduce((sum, key) => sum + Number(indicatorMap[key]?.aderencia || 0), 0) / 4;
+    const accuracyInside = accuracy >= 84;
+    const accuracyCard = document.querySelector('#operationAccuracy');
+    if (accuracyCard) {
+      accuracyCard.className = `operation-accuracy ${accuracyInside ? 'is-inside' : 'is-outside'}`;
+      accuracyCard.querySelector('strong').textContent = `${accuracy.toFixed(1).replace('.', ',')}%`;
+      accuracyCard.querySelector('b').textContent = accuracyInside ? 'Dentro da meta' : 'Fora da meta';
+    }
     const kpiContainer = document.querySelector('.kpi-grid, .indicator-kpi-groups');
     if (kpiContainer) {
       kpiContainer.className = 'indicator-kpi-groups';
